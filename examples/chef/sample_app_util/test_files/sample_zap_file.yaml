@@ -1,0 +1,646 @@
+- Root Node:
+    client_clusters:
+      OTA Software Update Provider:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        commands:
+        - ApplyUpdateRequest
+        - NotifyUpdateApplied
+        - QueryImage
+    server_clusters:
+      Access Control:
+        attributes:
+        - name: ACL
+          value: ''
+        - name: AccessControlEntriesPerFabric
+          value: '3'
+        - name: AttributeList
+          value: ''
+        - name: ClusterRevision
+          value: '1'
+        - name: Extension
+          value: ''
+        - name: FeatureMap
+          value: '0'
+        - name: SubjectsPerAccessControlEntry
+          value: '4'
+        - name: TargetsPerAccessControlEntry
+          value: '3'
+        commands: []
+      AdministratorCommissioning:
+        attributes:
+        - name: AdminFabricIndex
+          value: '1'
+        - name: AdminVendorId
+          value: '0'
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: WindowStatus
+          value: '0'
+        commands: []
+      Basic:
+        attributes:
+        - name: CapabilityMinima
+          value: ''
+        - name: ClusterRevision
+          value: '1'
+        - name: DataModelRevision
+          value: '10'
+        - name: FeatureMap
+          value: '0'
+        - name: HardwareVersion
+          value: '0'
+        - name: HardwareVersionString
+          value: ''
+        - name: LocalConfigDisabled
+          value: '0'
+        - name: Location
+          value: ''
+        - name: ManufacturingDate
+          value: ''
+        - name: NodeLabel
+          value: ''
+        - name: PartNumber
+          value: ''
+        - name: ProductID
+          value: ''
+        - name: ProductLabel
+          value: ''
+        - name: ProductName
+          value: ''
+        - name: ProductURL
+          value: ''
+        - name: Reachable
+          value: '1'
+        - name: SerialNumber
+          value: ''
+        - name: SoftwareVersion
+          value: '0'
+        - name: SoftwareVersionString
+          value: ''
+        - name: UniqueID
+          value: ''
+        - name: VendorID
+          value: ''
+        - name: VendorName
+          value: ''
+        commands: []
+      Descriptor:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: client list
+          value: ''
+        - name: device list
+          value: ''
+        - name: parts list
+          value: ''
+        - name: server list
+          value: ''
+        commands: []
+      Diagnostic Logs:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        commands:
+        - RetrieveLogsRequest
+      Ethernet Network Diagnostics:
+        attributes:
+        - name: CarrierDetect
+          value: '0'
+        - name: ClusterRevision
+          value: '1'
+        - name: CollisionCount
+          value: '0'
+        - name: FeatureMap
+          value: '3'
+        - name: FullDuplex
+          value: '0'
+        - name: OverrunCount
+          value: '0'
+        - name: PHYRate
+          value: ''
+        - name: PacketRxCount
+          value: '0'
+        - name: PacketTxCount
+          value: '0'
+        - name: TimeSinceReset
+          value: '0'
+        - name: TxErrCount
+          value: '0'
+        commands: []
+      Fixed Label:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: label list
+          value: ''
+        commands: []
+      General Commissioning:
+        attributes:
+        - name: BasicCommissioningInfo
+          value: ''
+        - name: Breadcrumb
+          value: '0'
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '6'
+        - name: LocationCapability
+          value: '0'
+        - name: RegulatoryConfig
+          value: '0'
+        commands:
+        - ArmFailSafeResponse
+        - CommissioningCompleteResponse
+      General Diagnostics:
+        attributes:
+        - name: ActiveHardwareFaults
+          value: ''
+        - name: ActiveNetworkFaults
+          value: ''
+        - name: ActiveRadioFaults
+          value: ''
+        - name: BootReasons
+          value: ''
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: NetworkInterfaces
+          value: ''
+        - name: RebootCount
+          value: '0'
+        - name: TotalOperationalHours
+          value: '0'
+        - name: UpTime
+          value: '0'
+        commands: []
+      Group Key Management:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: GroupKeyMap
+          value: ''
+        - name: GroupTable
+          value: ''
+        - name: MaxGroupKeysPerFabric
+          value: ''
+        - name: MaxGroupsPerFabric
+          value: ''
+        commands: []
+      Groups:
+        attributes:
+        - name: ClusterRevision
+          value: '4'
+        - name: FeatureMap
+          value: '0'
+        - name: name support
+          value: ''
+        commands: []
+      Localization Configuration:
+        attributes:
+        - name: ActiveLocale
+          value: ''
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: SupportedLocales
+          value: ''
+        commands: []
+      Network Commissioning:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: ConnectMaxTimeSeconds
+          value: ''
+        - name: FeatureMap
+          value: '2'
+        - name: InterfaceEnabled
+          value: ''
+        - name: LastConnectErrorValue
+          value: ''
+        - name: LastNetworkID
+          value: ''
+        - name: LastNetworkingStatus
+          value: ''
+        - name: MaxNetworks
+          value: ''
+        - name: Networks
+          value: ''
+        - name: ScanMaxTimeSeconds
+          value: ''
+        commands:
+        - ScanNetworksResponse
+      OTA Software Update Requestor:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: DefaultOtaProviders
+          value: '0'
+        - name: FeatureMap
+          value: '0'
+        - name: UpdatePossible
+          value: '1'
+        - name: UpdateState
+          value: '0'
+        - name: UpdateStateProgress
+          value: '0'
+        commands: []
+      Operational Credentials:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: CommissionedFabrics
+          value: ''
+        - name: CurrentFabricIndex
+          value: ''
+        - name: Fabrics
+          value: ''
+        - name: FeatureMap
+          value: '0'
+        - name: NOCs
+          value: ''
+        - name: SupportedFabrics
+          value: ''
+        - name: TrustedRootCertificates
+          value: ''
+        commands:
+        - AttestationResponse
+        - CSRResponse
+        - CertificateChainResponse
+        - NOCResponse
+      Software Diagnostics:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: CurrentHeapFree
+          value: '0'
+        - name: CurrentHeapHighWatermark
+          value: '0'
+        - name: CurrentHeapUsed
+          value: '0'
+        - name: FeatureMap
+          value: '1'
+        - name: ThreadMetrics
+          value: ''
+        commands: []
+      Switch:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        commands: []
+      Thread Network Diagnostics:
+        attributes:
+        - name: ActiveNetworkFaultsList
+          value: ''
+        - name: ActiveTimestamp
+          value: '0'
+        - name: AttachAttemptCount
+          value: '0'
+        - name: BetterPartitionAttachAttemptCount
+          value: '0'
+        - name: ChannelMask
+          value: '0'
+        - name: ChildRoleCount
+          value: '0'
+        - name: ClusterRevision
+          value: '1'
+        - name: DataVersion
+          value: ''
+        - name: DetachedRoleCount
+          value: '0'
+        - name: ExtendedPanId
+          value: '0'
+        - name: FeatureMap
+          value: '15'
+        - name: LeaderRoleCount
+          value: '0'
+        - name: LeaderRouterId
+          value: ''
+        - name: MeshLocalPrefix
+          value: ''
+        - name: NeighborTableList
+          value: ''
+        - name: NetworkName
+          value: '0'
+        - name: OperationalDatasetComponents
+          value: ''
+        - name: OverrunCount
+          value: '0'
+        - name: PanId
+          value: '0'
+        - name: ParentChangeCount
+          value: '0'
+        - name: PartitionId
+          value: ''
+        - name: PartitionIdChangeCount
+          value: '0'
+        - name: PendingTimestamp
+          value: '0'
+        - name: RouteTableList
+          value: ''
+        - name: RouterRoleCount
+          value: '0'
+        - name: RoutingRole
+          value: ''
+        - name: RxAddressFilteredCount
+          value: '0'
+        - name: RxBeaconCount
+          value: '0'
+        - name: RxBeaconRequestCount
+          value: '0'
+        - name: RxBroadcastCount
+          value: '0'
+        - name: RxDataCount
+          value: '0'
+        - name: RxDataPollCount
+          value: '0'
+        - name: RxDestAddrFilteredCount
+          value: '0'
+        - name: RxDuplicatedCount
+          value: '0'
+        - name: RxErrFcsCount
+          value: '0'
+        - name: RxErrInvalidSrcAddrCount
+          value: '0'
+        - name: RxErrNoFrameCount
+          value: '0'
+        - name: RxErrOtherCount
+          value: '0'
+        - name: RxErrSecCount
+          value: '0'
+        - name: RxErrUnknownNeighborCount
+          value: '0'
+        - name: RxOtherCount
+          value: '0'
+        - name: RxTotalCount
+          value: '0'
+        - name: RxUnicastCount
+          value: '0'
+        - name: SecurityPolicy
+          value: ''
+        - name: StableDataVersion
+          value: ''
+        - name: TxAckRequestedCount
+          value: '0'
+        - name: TxAckedCount
+          value: '0'
+        - name: TxBeaconCount
+          value: '0'
+        - name: TxBeaconRequestCount
+          value: '0'
+        - name: TxBroadcastCount
+          value: '0'
+        - name: TxDataCount
+          value: '0'
+        - name: TxDataPollCount
+          value: '0'
+        - name: TxDirectMaxRetryExpiryCount
+          value: '0'
+        - name: TxErrAbortCount
+          value: '0'
+        - name: TxErrBusyChannelCount
+          value: '0'
+        - name: TxErrCcaCount
+          value: '0'
+        - name: TxIndirectMaxRetryExpiryCount
+          value: '0'
+        - name: TxNoAckRequestedCount
+          value: '0'
+        - name: TxOtherCount
+          value: '0'
+        - name: TxRetryCount
+          value: '0'
+        - name: TxTotalCount
+          value: '0'
+        - name: TxUnicastCount
+          value: '0'
+        - name: channel
+          value: ''
+        - name: delay
+          value: '0'
+        - name: weighting
+          value: ''
+        commands: []
+      Time Format Localization:
+        attributes:
+        - name: ActiveCalendarType
+          value: '0'
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: HourFormat
+          value: '0'
+        - name: SupportedCalendarTypes
+          value: ''
+        commands: []
+      User Label:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: label list
+          value: ''
+        commands: []
+      WiFi Network Diagnostics:
+        attributes:
+        - name: BeaconLostCount
+          value: '0'
+        - name: BeaconRxCount
+          value: '0'
+        - name: ChannelNumber
+          value: '0'
+        - name: ClusterRevision
+          value: '1'
+        - name: CurrentMaxRate
+          value: '0'
+        - name: FeatureMap
+          value: '3'
+        - name: OverrunCount
+          value: '0'
+        - name: PacketMulticastRxCount
+          value: '0'
+        - name: PacketMulticastTxCount
+          value: '0'
+        - name: PacketUnicastRxCount
+          value: '0'
+        - name: PacketUnicastTxCount
+          value: '0'
+        - name: Rssi
+          value: '0'
+        - name: SecurityType
+          value: ''
+        - name: WiFiVersion
+          value: ''
+        - name: bssid
+          value: ''
+        commands: []
+- Dimmable Light:
+    client_clusters: {}
+    server_clusters:
+      Color Control:
+        attributes:
+        - name: ClusterRevision
+          value: '5'
+        - name: ColorCapabilities
+          value: '0'
+        - name: ColorLoopActive
+          value: '0'
+        - name: ColorLoopDirection
+          value: '0'
+        - name: ColorLoopStartEnhancedHue
+          value: '8960'
+        - name: ColorLoopStoredEnhancedHue
+          value: '0'
+        - name: ColorLoopTime
+          value: '25'
+        - name: ColorMode
+          value: '1'
+        - name: ColorTempPhysicalMaxMireds
+          value: '65279'
+        - name: ColorTempPhysicalMinMireds
+          value: '0'
+        - name: ColorTemperature
+          value: '250'
+        - name: CoupleColorTempToLevelMinMireds
+          value: ''
+        - name: CurrentHue
+          value: '0'
+        - name: CurrentSaturation
+          value: '0'
+        - name: CurrentX
+          value: '24939'
+        - name: CurrentY
+          value: '24701'
+        - name: EnhancedColorMode
+          value: '1'
+        - name: EnhancedCurrentHue
+          value: '0'
+        - name: FeatureMap
+          value: '0'
+        - name: NumberOfPrimaries
+          value: ''
+        - name: Options
+          value: '0'
+        - name: RemainingTime
+          value: '0'
+        - name: StartUpColorTemperatureMireds
+          value: ''
+        commands: []
+      Descriptor:
+        attributes:
+        - name: ClusterRevision
+          value: '1'
+        - name: FeatureMap
+          value: '0'
+        - name: client list
+          value: ''
+        - name: device list
+          value: ''
+        - name: parts list
+          value: ''
+        - name: server list
+          value: ''
+        commands: []
+      Groups:
+        attributes:
+        - name: ClusterRevision
+          value: '4'
+        - name: FeatureMap
+          value: '0'
+        - name: name support
+          value: ''
+        commands: []
+      Identify:
+        attributes:
+        - name: ClusterRevision
+          value: '4'
+        - name: FeatureMap
+          value: '0'
+        - name: identify time
+          value: '0'
+        - name: identify type
+          value: '0'
+        commands: []
+      Level Control:
+        attributes:
+        - name: ClusterRevision
+          value: '5'
+        - name: FeatureMap
+          value: '3'
+        - name: current frequency
+          value: '0'
+        - name: current level
+          value: '1'
+        - name: default move rate
+          value: ''
+        - name: max frequency
+          value: '0'
+        - name: max level
+          value: '254'
+        - name: min frequency
+          value: '0'
+        - name: min level
+          value: '0'
+        - name: off transition time
+          value: ''
+        - name: on level
+          value: '255'
+        - name: on off transition time
+          value: '0'
+        - name: on transition time
+          value: ''
+        - name: options
+          value: '0'
+        - name: remaining time
+          value: '0'
+        - name: start up current level
+          value: '255'
+        commands: []
+      Occupancy Sensing:
+        attributes:
+        - name: ClusterRevision
+          value: '3'
+        - name: FeatureMap
+          value: '0'
+        - name: occupancy
+          value: ''
+        - name: occupancy sensor type
+          value: ''
+        - name: occupancy sensor type bitmap
+          value: ''
+        commands: []
+      On/Off:
+        attributes:
+        - name: ClusterRevision
+          value: '4'
+        - name: FeatureMap
+          value: '1'
+        - name: GlobalSceneControl
+          value: '1'
+        - name: OffWaitTime
+          value: '0'
+        - name: OnOff
+          value: '0'
+        - name: OnTime
+          value: '0'
+        - name: StartUpOnOff
+          value: '255'
+        commands: []
