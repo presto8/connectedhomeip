@@ -129,7 +129,8 @@ public:
 
         /**
          * OnSubscriptionDropped will be called when a subscription is dropped for the given subscription transaction.
-         *
+         * which would indcate Whether we will try to auto-resubscribe and How long we will wait before trying to auto-resubscribe,
+         * if we plan to do it.
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
