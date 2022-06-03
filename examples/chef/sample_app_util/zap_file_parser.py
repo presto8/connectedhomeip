@@ -37,10 +37,10 @@ import re
 from typing import Dict, List, Literal, Optional, TypedDict, Union
 
 try:
-  import yaml
+    import yaml
 except ImportError:
-  print("Missing yaml library. Install with:\npip install pyyaml")
-  exit(1)
+    print("Missing yaml library. Install with:\npip install pyyaml")
+    exit(1)
 
 
 _HERE = os.path.abspath(os.path.dirname(__file__))
@@ -48,14 +48,14 @@ _MATTER_DEVICE_LIST = os.path.join(_HERE, "matter_device_types.json")
 
 
 class AttributeType(TypedDict):
-  name: str
-  value: str
+    name: str
+    value: str
 
 
 class ClusterType(TypedDict):
-  side: Literal["client", "server"]
-  commands: List[str]
-  attributes: Dict[str, AttributeType]
+    side: Literal["client", "server"]
+    commands: List[str]
+    attributes: Dict[str, AttributeType]
 
 
 class EndpointType(TypedDict):
@@ -64,214 +64,214 @@ class EndpointType(TypedDict):
 
 
 def _b64encode(input_data: bytes) -> bytes:
-  """Returns urlsafe base64 encoded with padding removed."""
-  return base64.urlsafe_b64encode(input_data).strip(b"=")
+    """Returns urlsafe base64 encoded with padding removed."""
+    return base64.urlsafe_b64encode(input_data).strip(b"=")
 
 
 def _b64decode(input_data: bytes) -> bytes:
-  """Returns urlsafe base64 decoded with padding added."""
-  # "=" is padding character that doesn't carry info.
-  # Adding 2x "=" will handle all edge cases where there may be
-  # incorrect number of bytes.
-  return base64.urlsafe_b64decode(input_data + b"==")
+    """Returns urlsafe base64 decoded with padding added."""
+    # "=" is padding character that doesn't carry info.
+    # Adding 2x "=" will handle all edge cases where there may be
+    # incorrect number of bytes.
+    return base64.urlsafe_b64decode(input_data + b"==")
 
 
 def _convert_name(name: str) -> str:
-  """Converts a pretty name into a file friendly one."""
-  return re.sub(r"[^a-zA-Z]+", "", name).lower()
+    """Converts a pretty name into a file friendly one."""
+    return re.sub(r"[^a-zA-Z]+", "", name).lower()
 
 
 def _load_matter_device_types() -> Dict[Union[int, str], Union[int, str]]:
-  """Load matter device type reversible mapping.
+    """Load matter device type reversible mapping.
 
-  This function should be updated to pull from the Matter spec once it is available publicly.
+    This function should be updated to pull from the Matter spec once it is available publicly.
 
-  Returns:
-    A dictionary mapping Matter device type IDs to their proper name and vice versa.
-  """
-  with open(_MATTER_DEVICE_LIST) as f:
-    mapping = json.loads(f.read())
-    reverse_mapping = {}
-    for key, val in mapping.items():
-      reverse_mapping[val] = key
-    mapping.update(reverse_mapping)
-  return mapping
+    Returns:
+      A dictionary mapping Matter device type IDs to their proper name and vice versa.
+    """
+    with open(_MATTER_DEVICE_LIST) as f:
+        mapping = json.loads(f.read())
+        reverse_mapping = {}
+        for key, val in mapping.items():
+            reverse_mapping[val] = key
+        mapping.update(reverse_mapping)
+    return mapping
 
 
 def _read_value(input_string: str) -> str:
-  """Convert various numeric forms to regular decimal format if possible."""
-  ret_val = ""
-  if not input_string:
+    """Convert various numeric forms to regular decimal format if possible."""
     ret_val = ""
-  if "0x" in input_string:
-    ret_val = int(input_string, 16)
-  elif "." in input_string:
-    try:
-      ret_val = float(input_string)
-    except ValueError:
-      pass
-  else:
-    try:
-      ret_val = int(input_string)
-    except ValueError:
-      pass
-  return str(ret_val)
+    if not input_string:
+        ret_val = ""
+    if "0x" in input_string:
+        ret_val = int(input_string, 16)
+    elif "." in input_string:
+        try:
+            ret_val = float(input_string)
+        except ValueError:
+            pass
+    else:
+        try:
+            ret_val = int(input_string)
+        except ValueError:
+            pass
+    return str(ret_val)
 
 
 def generate_hash(zap_file_path: str) -> str:
-  """Generates a hash for a zap file.
+    """Generates a hash for a zap file.
 
-  Args:
-    zap_file_path: Path to the zap file.
+    Args:
+      zap_file_path: Path to the zap file.
 
-  Returns:
-    MD5 hash of the metadata generated from the zap file.
-    This is converted to base64 and then the first 10 characters are used.
-  """
-  parsed = generate_metadata(zap_file_path, use_ids=True)
-  # Use json.dumps to produce a consistent output for the object passed into it.
-  digestible_content = json.dumps(parsed, sort_keys=True)
-  md5_hash = hashlib.md5(digestible_content.encode("utf-8")).digest()
-  output = str(_b64encode(md5_hash), encoding="utf-8")[:10]
-  # Replace "-" and "_" with "a" and "b".
-  # The reason for doing this is to allow the generated name to be parsed by splitting on "_".
-  # Replacing "-" makes the name easier to parse visually.
-  # This increases likelihood of hash collisions, but minimally so. See module docstring.
-  return output.replace("-", "a").replace("_", "b")
+    Returns:
+      MD5 hash of the metadata generated from the zap file.
+      This is converted to base64 and then the first 10 characters are used.
+    """
+    parsed = generate_metadata(zap_file_path, use_ids=True)
+    # Use json.dumps to produce a consistent output for the object passed into it.
+    digestible_content = json.dumps(parsed, sort_keys=True)
+    md5_hash = hashlib.md5(digestible_content.encode("utf-8")).digest()
+    output = str(_b64encode(md5_hash), encoding="utf-8")[:10]
+    # Replace "-" and "_" with "a" and "b".
+    # The reason for doing this is to allow the generated name to be parsed by splitting on "_".
+    # Replacing "-" makes the name easier to parse visually.
+    # This increases likelihood of hash collisions, but minimally so. See module docstring.
+    return output.replace("-", "a").replace("_", "b")
 
 
 def generate_metadata(
-      zap_file_path: str,
-      use_ids: bool = False) -> List[Dict[str, EndpointType]]:
-  """Parses a zap_file and returns structure containing minimal content.
+        zap_file_path: str,
+        use_ids: bool = False) -> List[Dict[str, EndpointType]]:
+    """Parses a zap_file and returns structure containing minimal content.
 
-  The lists provided in the returned objects are sorted except for the top level list of endpoints.
-  Lists containing dicts will be sorted by the "name" key of the individual dicts.
+    The lists provided in the returned objects are sorted except for the top level list of endpoints.
+    Lists containing dicts will be sorted by the "name" key of the individual dicts.
 
-  Args:
-    zap_file_path: Path to the zap file.
-    use_ids: Whether to use IDs or names for metadata. IDs are preferred when generating the hash.
+    Args:
+      zap_file_path: Path to the zap file.
+      use_ids: Whether to use IDs or names for metadata. IDs are preferred when generating the hash.
 
-  Returns:
-    Dictionary containing information about endpoints and clusters. Format will be as follows:
-    [
-      {
-        <endpoint_0_name>: {
-          "server_clusters": {
-            <cluster_name>: {
-              "name": <name>,
-              "commands": [
-                <command_name>
-              ],
-              "attributes": [
-                {
-                  "name": <attribute_name>,
-                  "value": <attribute_value>
-                }
-              ]
+    Returns:
+      Dictionary containing information about endpoints and clusters. Format will be as follows:
+      [
+        {
+          <endpoint_0_name>: {
+            "server_clusters": {
+              <cluster_name>: {
+                "name": <name>,
+                "commands": [
+                  <command_name>
+                ],
+                "attributes": [
+                  {
+                    "name": <attribute_name>,
+                    "value": <attribute_value>
+                  }
+                ]
+              }
+            }
+            "client_clusters": {
+              <clusters>  # See above
             }
           }
-          "client_clusters": {
-            <clusters>  # See above
-          }
         }
-      }
-    ]
-  """
-  endpoint_names = _load_matter_device_types()
-  with open(zap_file_path) as f:
-    app_data = json.loads(f.read())
+      ]
+    """
+    endpoint_names = _load_matter_device_types()
+    with open(zap_file_path) as f:
+        app_data = json.loads(f.read())
 
-  return_obj: List[Dict[str, EndpointType]] = []
+    return_obj: List[Dict[str, EndpointType]] = []
 
-  for endpoint in app_data["endpointTypes"]:
-    device_type_id = endpoint["deviceTypeCode"]
-    device_type_name = endpoint_names[device_type_id]
+    for endpoint in app_data["endpointTypes"]:
+        device_type_id = endpoint["deviceTypeCode"]
+        device_type_name = endpoint_names[device_type_id]
 
-    if use_ids:
-      endpoint_ref = str(device_type_id)
-      ref_key = "code"
-    else:
-      endpoint_ref = device_type_name
-      ref_key = "name"
+        if use_ids:
+            endpoint_ref = str(device_type_id)
+            ref_key = "code"
+        else:
+            endpoint_ref = device_type_name
+            ref_key = "name"
 
-    endpoint_obj: Dict[str, EndpointType] = {endpoint_ref: {}}
-    return_obj.append(endpoint_obj)
+        endpoint_obj: Dict[str, EndpointType] = {endpoint_ref: {}}
+        return_obj.append(endpoint_obj)
 
-    client_clusters: Dict[str, ClusterType] = {}
-    server_clusters: Dict[str, ClusterType] = {}
+        client_clusters: Dict[str, ClusterType] = {}
+        server_clusters: Dict[str, ClusterType] = {}
 
-    endpoint_obj[endpoint_ref]["client_clusters"] = client_clusters
-    endpoint_obj[endpoint_ref]["server_clusters"] = server_clusters
+        endpoint_obj[endpoint_ref]["client_clusters"] = client_clusters
+        endpoint_obj[endpoint_ref]["server_clusters"] = server_clusters
 
-    for cluster in endpoint["clusters"]:
-      if not cluster["enabled"]:
-        continue
+        for cluster in endpoint["clusters"]:
+            if not cluster["enabled"]:
+                continue
 
-      cluster_obj: ClusterType = {"attributes": [], "commands": []}
+            cluster_obj: ClusterType = {"attributes": [], "commands": []}
 
-      for attribute in cluster["attributes"]:
-        if attribute["included"]:
-          attribute_obj: AttributeType = {
-            "name": attribute[ref_key], "value": _read_value(attribute["defaultValue"])}
-          cluster_obj["attributes"].append(attribute_obj)
-      cluster_obj["attributes"] = sorted(cluster_obj["attributes"], key = lambda x: x["name"])
+            for attribute in cluster["attributes"]:
+                if attribute["included"]:
+                    attribute_obj: AttributeType = {
+                        "name": attribute[ref_key], "value": _read_value(attribute["defaultValue"])}
+                    cluster_obj["attributes"].append(attribute_obj)
+            cluster_obj["attributes"] = sorted(cluster_obj["attributes"], key=lambda x: x["name"])
 
-      for command in cluster["commands"]:
-        if cluster["side"] == "client" and command["outgoing"] == 1:
-          cluster_obj["commands"].append(command[ref_key])
-        elif cluster["side"] == "server" and command["incoming"] == 1:
-          cluster_obj["commands"].append(command[ref_key])
+            for command in cluster["commands"]:
+                if cluster["side"] == "client" and command["outgoing"] == 1:
+                    cluster_obj["commands"].append(command[ref_key])
+                elif cluster["side"] == "server" and command["incoming"] == 1:
+                    cluster_obj["commands"].append(command[ref_key])
 
-      cluster_obj["commands"] = sorted(cluster_obj["commands"])
+            cluster_obj["commands"] = sorted(cluster_obj["commands"])
 
-      if cluster["side"] == "client":
-        client_clusters[cluster[ref_key]] = cluster_obj
-      else:
-        server_clusters[cluster[ref_key]] = cluster_obj
+            if cluster["side"] == "client":
+                client_clusters[cluster[ref_key]] = cluster_obj
+            else:
+                server_clusters[cluster[ref_key]] = cluster_obj
 
-  return return_obj
+    return return_obj
 
 
 def generate_metadata_file(zap_file_path: str, output_file_path: Optional[str] = None) -> str:
-  """Generates metadata file for a zap file input.
+    """Generates metadata file for a zap file input.
 
-  Args:
-    zap_file_path: Path to the zap file to parse for generating the metadata file.
-    output_file_path: Full path to output file. If not included, then will generate the file
-      adjacent to the zap file with the same name of the zap file but with the extension ".yaml".
-  """
-  parsed = generate_metadata(zap_file_path)
-  output = yaml.dump(parsed, sort_keys=True)
+    Args:
+      zap_file_path: Path to the zap file to parse for generating the metadata file.
+      output_file_path: Full path to output file. If not included, then will generate the file
+        adjacent to the zap file with the same name of the zap file but with the extension ".yaml".
+    """
+    parsed = generate_metadata(zap_file_path)
+    output = yaml.dump(parsed, sort_keys=True)
 
-  if output_file_path:
-    dirname, filename = os.path.split(output_file_path)
-    filename = os.path.splitext(filename)[0]
-    output_file_path = os.path.join(dirname, f"{filename}.yaml")
-    with open(output_file_path, "w") as f:
-      f.write(output)
-  else:
-    dirname, filename = os.path.split(zap_file_path)
-    filename = os.path.splitext(filename)[0]
-    output_file_path = os.path.join(dirname, f"{filename}.yaml")
-    with open(output_file_path, "w") as f:
-      f.write(output)
-  return output_file_path
+    if output_file_path:
+        dirname, filename = os.path.split(output_file_path)
+        filename = os.path.splitext(filename)[0]
+        output_file_path = os.path.join(dirname, f"{filename}.yaml")
+        with open(output_file_path, "w") as f:
+            f.write(output)
+    else:
+        dirname, filename = os.path.split(zap_file_path)
+        filename = os.path.splitext(filename)[0]
+        output_file_path = os.path.join(dirname, f"{filename}.yaml")
+        with open(output_file_path, "w") as f:
+            f.write(output)
+    return output_file_path
 
 
 def generate_name(zap_file_path: str) -> str:
-  """Generates the name for a zap file following convention.
+    """Generates the name for a zap file following convention.
 
-  Args:
-    zap_file_path: Path to the zap file to parse for generating the metadata file.
+    Args:
+      zap_file_path: Path to the zap file to parse for generating the metadata file.
 
-  Returns:
-    Name of the file generated by following convention.
-  """
-  parsed = generate_metadata(zap_file_path)
-  names = []
-  for endpoint in parsed:
-    name = next(iter(endpoint))
-    names.append(_convert_name(name))
-  hash_string = generate_hash(zap_file_path)
-  return "_".join(names) + f"_{hash_string}"
+    Returns:
+      Name of the file generated by following convention.
+    """
+    parsed = generate_metadata(zap_file_path)
+    names = []
+    for endpoint in parsed:
+        name = next(iter(endpoint))
+        names.append(_convert_name(name))
+    hash_string = generate_hash(zap_file_path)
+    return "_".join(names) + f"_{hash_string}"
