@@ -125,6 +125,13 @@ void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
+void InteractionModel::OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                                             uint32_t aNextResubscribeIntervalMsec)
+{
+    ChipLogError(chipTool, "\nSubscription is dropped");
+    ContinueOnChipMainThread(CHIP_NO_ERROR);
+}
+
 /////////// WriteClient Callback Interface /////////
 void InteractionModel::OnResponse(const WriteClient * client, const ConcreteDataAttributePath & path, StatusIB status)
 {

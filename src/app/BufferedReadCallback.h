@@ -81,6 +81,12 @@ private:
         mCallback.OnSubscriptionEstablished(aSubscriptionId);
     }
 
+    void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {
+        mCallback.OnSubscriptionDropped(aError, aSubscriptionId, aResubscribe, aNextResubscribeIntervalMsec);
+    }
+
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));

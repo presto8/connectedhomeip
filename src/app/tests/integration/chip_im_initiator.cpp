@@ -145,6 +145,10 @@ public:
             }
         }
     }
+
+    void OnSubscriptionDropped(CHIP_ERROR aError, chip::SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {}
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
                          const chip::app::StatusIB & status) override
     {}

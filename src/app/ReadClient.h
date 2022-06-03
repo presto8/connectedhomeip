@@ -118,6 +118,7 @@ public:
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
+         * If using auto resubscription, OnSubscriptionEstablished will be called whenever resubscription is established
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -125,6 +126,21 @@ public:
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
         virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
+
+        /**
+         * OnSubscriptionDropped will be called when a subscription is dropped for the given subscription transaction.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] aError The error code of the subscription that was dropped.
+         * @param[in] aSubscriptionId The identifier of the subscription that was dropped.
+         * @param[in] aResubscribe boolean regarding whether it would retry the subscription next time
+         * @param[in] aNextResubscribeIntervalMsec tell How long we will wait before trying to auto-resubscribe.
+         */
+        virtual void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                                           uint32_t aNextResubscribeIntervalMsec)
+        {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -276,7 +292,7 @@ public:
     CHIP_ERROR GetReportingIntervals(uint16_t & aMinIntervalFloorSeconds, uint16_t & aMaxIntervalCeilingSeconds) const
     {
         VerifyOrReturnError(IsSubscriptionType(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(IsSubscriptionIdle(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
         aMinIntervalFloorSeconds   = mMinIntervalFloorSeconds;
         aMaxIntervalCeilingSeconds = mMaxIntervalCeilingSeconds;
@@ -338,7 +354,7 @@ private:
      *
      */
     bool IsIdle() const { return mState == ClientState::Idle; }
-    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
@@ -365,7 +381,7 @@ private:
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     const char * GetStateStr() const;
-    bool ResubscribeIfNeeded();
+    void ResubscribeIfNeeded(bool & aResubscribe, uint32_t & aNextResubscribeIntervalMsec);
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     // SendSubscribeRequest performs som validation on aSubscribePrepareParams

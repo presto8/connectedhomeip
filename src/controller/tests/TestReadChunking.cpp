@@ -135,6 +135,10 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
+    void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {}
+
     uint32_t mAttributeCount        = 0;
     bool mOnReportEnd               = false;
     bool mOnSubscriptionEstablished = false;
@@ -303,6 +307,9 @@ public:
     void OnReportEnd() override { mOnReportEnd = true; }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {}
 
     uint32_t mAttributeCount = 0;
     // We record every dataversion field from every attribute IB.

@@ -1429,6 +1429,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     auto sessionHandle                       = ctx.GetSessionBobToAlice();
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
+    uint32_t numSubscriptionDroppedCalls     = 0;
 
     responseDirective = kSendDataResponse;
 
@@ -1451,6 +1452,11 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
         numSubscriptionEstablishedCalls++;
     };
 
+    auto onSubscriptionDroppedCb = [&numSubscriptionDroppedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                  bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+        numSubscriptionDroppedCalls++;
+    };
+
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
     // callbacks.
@@ -1467,7 +1473,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
-                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, onSubscriptionDroppedCb, false, true) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
@@ -1484,7 +1490,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
-
+    NL_TEST_ASSERT(apSuite, numSubscriptionDroppedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
@@ -1497,6 +1503,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     uint32_t numSuccessCalls                 = 0;
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
+    uint32_t numSubscriptionDroppedCalls     = 0;
 
     responseDirective = kSendDataResponse;
 
@@ -1516,6 +1523,10 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
         numSubscriptionEstablishedCalls++;
     };
 
+    auto onSubscriptionDroppedCb = [&numSubscriptionDroppedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                  bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+        numSubscriptionDroppedCalls++;
+    };
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
     // callbacks.
@@ -1530,7 +1541,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     NL_TEST_ASSERT(apSuite,
                    Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                       onSubscriptionEstablishedCb, onSubscriptionDroppedCb, false, true) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
 
@@ -1542,11 +1553,10 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     //
     NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 0);
+    NL_TEST_ASSERT(apSuite, numSubscriptionDroppedCalls == 0);
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
@@ -1561,6 +1571,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
     uint32_t numSuccessCalls                 = 0;
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
+    uint32_t numSubscriptionDroppedCalls     = 0;
 
     responseDirective = kSendDataResponse;
 
@@ -1589,6 +1600,10 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
         numSubscriptionEstablishedCalls++;
     };
 
+    auto onSubscriptionDroppedCb = [&numSubscriptionDroppedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                  bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+        numSubscriptionDroppedCalls++;
+    };
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
     // callbacks.
@@ -1603,7 +1618,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
     NL_TEST_ASSERT(apSuite,
                    Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                       onSubscriptionEstablishedCb, onSubscriptionDroppedCb, true) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
 
@@ -1619,6 +1634,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals(
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
+    NL_TEST_ASSERT(apSuite, numSubscriptionDroppedCalls == 1);
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
@@ -1676,8 +1692,8 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     auto sessionHandle                       = aCtx.GetSessionBobToAlice();
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
+    uint32_t numSubscriptionDroppedCalls     = 0;
+    responseDirective                        = kSendDataResponse;
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1703,12 +1719,17 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
         }
     };
 
+    auto onSubscriptionDroppedCb = [&numSubscriptionDroppedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                  bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+        numSubscriptionDroppedCalls++;
+    };
+
     for (size_t i = 0; i < aSubscribeCount; ++i)
     {
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, onSubscriptionDroppedCb, false, true) == CHIP_NO_ERROR);
     }
 
     aCtx.DrainAndServiceIO();
@@ -1762,6 +1783,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     auto sessionHandle                       = ctx.GetSessionBobToAlice();
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
+    uint32_t numSubscriptionDroppedCalls     = 0;
 
     responseDirective = kSendDataResponse;
 
@@ -1786,6 +1808,11 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         numSubscriptionEstablishedCalls++;
     };
 
+    auto onSubscriptionDroppedCb = [&numSubscriptionDroppedCalls](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                  bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+        numSubscriptionDroppedCalls++;
+    };
+
     //
     // Try to issue parallel subscriptions that will exceed the value for CHIP_IM_MAX_NUM_READ_HANDLER.
     // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
@@ -1797,7 +1824,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, onSubscriptionDroppedCb, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
@@ -1813,9 +1840,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
-
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
+    NL_TEST_ASSERT(apSuite, numSubscriptionDroppedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
@@ -1989,11 +2015,18 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
 
+    void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {
+        mOnSubscriptionDroppedCount++;
+    }
+
     void ClearCounters()
     {
         mAttributeCount                 = 0;
         mOnReportEnd                    = 0;
         mOnSubscriptionEstablishedCount = 0;
+        mOnSubscriptionDroppedCount     = 0;
         mOnDone                         = 0;
         mOnError                        = 0;
         mLastError                      = CHIP_NO_ERROR;
@@ -2002,6 +2035,7 @@ public:
     int32_t mAttributeCount                 = 0;
     int32_t mOnReportEnd                    = 0;
     int32_t mOnSubscriptionEstablishedCount = 0;
+    int32_t mOnSubscriptionDroppedCount     = 0;
     int32_t mOnDone                         = 0;
     int32_t mOnError                        = 0;
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;

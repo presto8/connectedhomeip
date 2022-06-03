@@ -53,13 +53,16 @@ public:
     using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & readClient)>;
-
+    using OnSubscriptionDroppedCallbackType     = std::function<void(const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                 bool aResubscribe, uint32_t aNextResubscribeIntervalMsec)>;
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
                                OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
-                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr,
+                               OnSubscriptionDroppedCallbackType aOnSubscriptionDropped         = nullptr) :
         mClusterId(aClusterId),
         mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone),
-        mOnSubscriptionEstablished(aOnSubscriptionEstablished), mBufferedReadAdapter(*this)
+        mOnSubscriptionEstablished(aOnSubscriptionEstablished), mOnSubscriptionDropped(aOnSubscriptionDropped),
+        mBufferedReadAdapter(*this)
     {}
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
@@ -106,6 +109,15 @@ private:
         }
     }
 
+    void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {
+        if (mOnSubscriptionDropped)
+        {
+            mOnSubscriptionDropped(*mReadClient.get(), aError, aResubscribe, aNextResubscribeIntervalMsec);
+        }
+    }
+
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
         VerifyOrDie(aReadPrepareParams.mAttributePathParamsListSize == 1 &&
@@ -124,6 +136,7 @@ private:
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
+    OnSubscriptionDroppedCallbackType mOnSubscriptionDropped;
     app::BufferedReadCallback mBufferedReadAdapter;
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
@@ -135,12 +148,16 @@ public:
     using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * apReadClient)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & aReadClient)>;
+    using OnSubscriptionDroppedCallbackType     = std::function<void(const app::ReadClient & aReadClient, CHIP_ERROR aError,
+                                                                 bool aResubscribe, uint32_t aNextResubscribeIntervalMsec)>;
 
     TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
-                           OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+                           OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr,
+                           OnSubscriptionDroppedCallbackType aOnSubscriptionDropped         = nullptr) :
         mOnSuccess(aOnSuccess),
-        mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
+        mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished),
+        mOnSubscriptionDropped(aOnSubscriptionDropped)
     {}
 
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
@@ -194,7 +211,16 @@ private:
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished();
+            mOnSubscriptionEstablished(*mReadClient.get());
+        }
+    }
+
+    void OnSubscriptionDropped(CHIP_ERROR aError, SubscriptionId aSubscriptionId, bool aResubscribe,
+                               uint32_t aNextResubscribeIntervalMsec) override
+    {
+        if (mOnSubscriptionDropped)
+        {
+            mOnSubscriptionDropped(*mReadClient.get(), aError, aResubscribe, aNextResubscribeIntervalMsec);
         }
     }
 
@@ -202,6 +228,7 @@ private:
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
+    OnSubscriptionDroppedCallbackType mOnSubscriptionDropped;
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 

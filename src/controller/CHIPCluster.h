@@ -50,6 +50,8 @@ using ReadResponseSuccessCallback     = void (*)(void * context, T responseData)
 using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err);
 using ReadDoneCallback                = void (*)(void * context);
 using SubscriptionEstablishedCallback = void (*)(void * context);
+using SubscriptionDroppedCallback     = void (*)(void * context, CHIP_ERROR aError, bool aResubscribe,
+                                             uint32_t aNextResubscribeIntervalMsec);
 
 class DLL_EXPORT ClusterBase
 {
@@ -263,12 +265,14 @@ public:
     CHIP_ERROR
     SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
                        ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
-                       SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr, bool aIsFabricFiltered = true,
+                       SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                       SubscriptionDroppedCallback subscriptionDroppedCb = nullptr, bool aIsFabricFiltered = true,
                        bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb, aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb, subscriptionDroppedCb, aIsFabricFiltered,
+            aKeepPreviousSubscriptions, aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -276,7 +280,8 @@ public:
                                   ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                                  bool aIsFabricFiltered = true, bool aKeepPreviousSubscriptions = false,
+                                  SubscriptionDroppedCallback subscriptionDroppedCb = nullptr, bool aIsFabricFiltered = true,
+                                  bool aKeepPreviousSubscriptions            = false,
                                   const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -302,10 +307,18 @@ public:
             }
         };
 
+        auto onSubscriptionDroppedCb = [context, subscriptionDroppedCb](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                        bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+            if (subscriptionDroppedCb != nullptr)
+            {
+                subscriptionDroppedCb(context, aError, aResubscribe, aNextResubscribeIntervalMsec);
+            }
+        };
+
         return Controller::SubscribeAttribute<DecodableType>(
             mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, onReportCb,
-            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, aIsFabricFiltered,
-            aKeepPreviousSubscriptions, aDataVersion);
+            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onSubscriptionDroppedCb,
+            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
     }
 
     /**
@@ -351,7 +364,8 @@ public:
                               ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                               uint16_t maxIntervalCeilingSeconds,
                               SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
-                              bool aKeepPreviousSubscriptions = false, bool aIsUrgentEvent = false)
+                              SubscriptionDroppedCallback subscriptionDroppedCb = nullptr, bool aKeepPreviousSubscriptions = false,
+                              bool aIsUrgentEvent = false)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -376,10 +390,18 @@ public:
             }
         };
 
+        auto onSubscriptionDroppedCb = [context, subscriptionDroppedCb](const app::ReadClient & readClient, CHIP_ERROR aError,
+                                                                        bool aResubscribe, uint32_t aNextResubscribeIntervalMsec) {
+            if (subscriptionDroppedCb != nullptr)
+            {
+                subscriptionDroppedCb(context, aError, aResubscribe, aNextResubscribeIntervalMsec);
+            }
+        };
+
         return Controller::SubscribeEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
                                                          mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds,
                                                          maxIntervalCeilingSeconds, onSubscriptionEstablishedCb,
-                                                         aKeepPreviousSubscriptions, aIsUrgentEvent);
+                                                         onSubscriptionDroppedCb, aKeepPreviousSubscriptions, aIsUrgentEvent);
     }
 
 protected:
